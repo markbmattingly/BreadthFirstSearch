@@ -51,7 +51,7 @@ namespace BreadthFirstTests
         }
 
         [TestMethod]
-        public void BreadthFirstSearchDoesInFactSearchBreadthFirst()
+        public void BreadthFirstSearchTraversesSevenVertices()
         {
             Graph graph = new Graph(7);
             graph.AddEdge(0, 1);
