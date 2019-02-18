@@ -72,6 +72,54 @@ namespace BreadthFirstTests
 
         }
 
+        [TestMethod]
+        public void BreadthFirstSearchTraversesSevenVerticesWithjSteveKuosEdges()
+        {
+            Graph graph = new Graph(7);
+            graph.AddEdge(1, 0);
+            graph.AddEdge(1, 2);
+            graph.AddEdge(1, 5);
+            graph.AddEdge(2, 3);
+            graph.AddEdge(2, 4);
+            graph.AddEdge(3, 4);
+            graph.AddEdge(4, 1);
+
+            List<int> verticesInTraversalOrder = graph.BreadthFirstSearch(2);
+            CollectionAssert.AreEqual(verticesInTraversalOrder, new List<int> { 2,3,4,1,0,5 });
+        }
+
+        [TestMethod]
+        public void DepthFirstSearchTraversesFourVertices()
+        {
+            Graph graph = new Graph(4);
+            graph.AddEdge(0, 1);
+            graph.AddEdge(0, 2);
+            graph.AddEdge(1, 2);
+            graph.AddEdge(2, 0);
+            graph.AddEdge(2, 3);
+            graph.AddEdge(3, 3);
+
+            int startingVertex = 2;
+            List<int> verticesInTraversalOrder = graph.DepthFirstSearch(startingVertex);
+            CollectionAssert.AreEqual(verticesInTraversalOrder, new List<int> { 2, 0, 1, 3 });
+        }
+
+        [TestMethod]
+        public void DepthFirstSearchTraversesSevenVerticesWithjSteveKuosEdges()
+        {
+            Graph graph = new Graph(7);
+            graph.AddEdge(1, 0);
+            graph.AddEdge(1, 2);
+            graph.AddEdge(1, 5);
+            graph.AddEdge(2, 3);
+            graph.AddEdge(2, 4);
+            graph.AddEdge(3, 4);
+            graph.AddEdge(4, 1);
+
+            List<int> verticesInTraversalOrder = graph.DepthFirstSearch(2);
+            CollectionAssert.AreEqual(verticesInTraversalOrder, new List<int> { 2, 3, 4, 1, 0, 5 });
+        }
+
         public class Graph
         {
             public Graph(int numberOfVertices)
@@ -84,6 +132,7 @@ namespace BreadthFirstTests
             }
 
             public LinkedList<int>[] Vertices { get; set; }
+            private bool[] visited;
 
             public void AddEdge(int edgeStartVertexIndex, int edgeEndVertexIndex)
             {
@@ -93,8 +142,8 @@ namespace BreadthFirstTests
             public List<int> BreadthFirstSearch(int startingVertexIndex)
             {
                 List<int> traversedVertices = new List<int>();
-
-                bool[] visited = new bool[Vertices.Length];
+                
+                visited = new bool[Vertices.Length];
 
                 LinkedList<int> queue = new LinkedList<int>();
 
@@ -122,6 +171,33 @@ namespace BreadthFirstTests
                 }
 
                 return traversedVertices;
+            }
+
+            public List<int> DepthFirstSearch(int startingVertex)
+            {
+                List<int> traversedVertices = new List<int>();
+                visited = new bool[Vertices.Length];
+
+                visited[startingVertex] = true;
+
+                DepthFirstSearchUtil(traversedVertices, startingVertex);
+
+                return traversedVertices;
+            }
+
+            private void DepthFirstSearchUtil(List<int> traversedVertices, int startingVertex)
+            {
+                traversedVertices.Add(startingVertex);
+                LinkedList<int>.Enumerator enumeratorOnCurrentVertex = Vertices[startingVertex].GetEnumerator();
+                visited[startingVertex] = true;
+                while (enumeratorOnCurrentVertex.MoveNext())
+                {
+                    int currentVertexIndex = enumeratorOnCurrentVertex.Current;
+                    if (!visited[currentVertexIndex])
+                    {
+                        DepthFirstSearchUtil(traversedVertices, currentVertexIndex);
+                    }
+                }
             }
         }
     }
