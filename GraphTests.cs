@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -120,6 +121,35 @@ namespace BreadthFirstTests
             CollectionAssert.AreEqual(verticesInTraversalOrder, new List<int> { 2, 3, 4, 1, 0, 5 });
         }
 
+        [TestMethod]
+        public void ShortestPathsFoundFromSourceToEachOfNineVertices()
+        {
+            int[,] definedGraph =
+            {
+                {0,4,0,0,0,0,0,8,0},
+                {4,0,8,0,0,0,0,11,0},
+                {0,8,0,7,0,4,0,0,2},
+                {0,0,7,0,9,14,0,0,0},
+                {0,0,0,9,0,10,0,0,0},
+                {0,0,4,14,10,0,2,0,0},
+                {0,0,0,0,0,2,0,1,6},
+                {8,11,0,0,0,0,1,0,7},
+                {0,0,2,0,0,0,6,7,0}
+            };
+
+            Graph graph = new Graph(0);
+            int[] distances = graph.Dijkstra(definedGraph, 0);
+            Assert.AreEqual(0,distances[0]);
+            Assert.AreEqual(4,distances[1]);
+            Assert.AreEqual(12,distances[2]);
+            Assert.AreEqual(19,distances[3]);
+            Assert.AreEqual(21,distances[4]);
+            Assert.AreEqual(11,distances[5]);
+            Assert.AreEqual(9,distances[6]);
+            Assert.AreEqual(8,distances[7]);
+            Assert.AreEqual(14,distances[8]);
+        }
+
         public class Graph
         {
             public Graph(int numberOfVertices)
@@ -198,6 +228,52 @@ namespace BreadthFirstTests
                         DepthFirstSearchUtil(traversedVertices, currentVertexIndex);
                     }
                 }
+            }
+
+            public int[] Dijkstra(int[,] graph, int sourceVertex)
+            {
+                Boolean[] sptSet = new Boolean[graph.GetLength(0)];
+                int[] distances = new int[graph.GetLength(0)];
+                for (int index =0;index < graph.GetLength(0); index++)
+                {
+                    sptSet[index] = false;
+                    distances[index] = int.MaxValue;
+                }
+
+                distances[sourceVertex] = 0;
+
+                for (int count = 0; count < graph.GetLength(0) - 1; count++)
+                {
+                    int u = FindClosestNonTraversed(graph.GetLength(0), distances, sptSet);
+                    sptSet[u] = true;
+
+                    for (int v = 0; v < graph.GetLength(0); v++) {
+                        if (!sptSet[v] && 
+                            graph[u, v] != 0 &&
+                            distances[u] + graph[u, v] < distances[v])
+                        {
+                            distances[v] = distances[u] + graph[u, v];
+                        }
+                    }
+                }
+
+                return distances;
+            }
+
+            private int FindClosestNonTraversed(int totalVertices, int[] distances, bool[] traversedVertices)
+            {
+                int minimumDistance = int.MaxValue;
+                int indexOfClosestVertex = -1;
+
+                for (int index = 0; index < totalVertices -1; index++) {
+                    if (traversedVertices[index] == false && distances[index] <= minimumDistance)
+                    {
+                        minimumDistance = distances[index];
+                        indexOfClosestVertex = index;
+                    }
+                }
+
+                return indexOfClosestVertex;
             }
         }
     }
